@@ -28,7 +28,6 @@ class CategoryItemView(generics.ListAPIView):
     
 
 
-
 class CategoryListView(generics.ListAPIView):
-    queryset = Category.objects.filter(level=1) #filtering by level 1 instead of showing all the categories (below men and women)
+    queryset = Category.objects.filter(level=3)
     serializer_class = CategorySerializer
