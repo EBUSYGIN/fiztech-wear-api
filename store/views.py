@@ -1,8 +1,13 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .models import Category, Product
-from .serializers import ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer, UserSerializer, CustomTokenObtainPairSerializer
 from . import models
+from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
 
 # Create your views here.
 class ProductListView(generics.ListAPIView):
@@ -28,7 +33,18 @@ class CategoryItemView(generics.ListAPIView):
     
 
 
-
 class CategoryListView(generics.ListAPIView):
-    queryset = Category.objects.filter(level=1) #filtering by level 1 instead of showing all the categories (below men and women)
+    queryset = Category.objects.filter(level=3)
     serializer_class = CategorySerializer
+
+
+class CreateUserView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
