@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Product, ProductImage, Category
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, RefreshToken
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -38,8 +39,59 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
+        # refresh = RefreshToken.for_user(user)
+        # return user, refresh
         return user
+    
 
+
+
+    
+
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    class Meta:
+        model = User
+
+
+    def validate(self, attrs):
+        user = User.objects.filter(username = attrs['username']).first()
+        if user is None:
+            raise serializers.ValidationError('Неверное имя пользователя или пароль.')
+
+        if not user.check_password(attrs.get('password')):
+            raise serializers.ValidationError('Неверное имя пользователя или пароль.')
+        
+        # user_serializer = UserSerializer(user)
+        refresh = self.get_token(user)
+        data = {}
+        data['id'] = str(UserSerializer(user).data['id'])
+        data['username'] = str(UserSerializer(user).data['username'])
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+
+        return data
+        # user_serializer.data, 
+
+
+# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     def validate(self, attrs):
+#         user = User.objects.filter(username=attrs.get('username')).first()
+
+        # if user is None:
+        #     raise serializers.ValidationError('Неверное имя пользователя или пароль.')
+
+        # if not user.check_password(attrs.get('password')):
+        #     raise serializers.ValidationError('Неверное имя пользователя или пароль.')
+        
+#         refresh = self.get_token(user)
+
+#         data = {}
+#         data['refresh'] = str(refresh)
+#         data['access'] = str(refresh.access_token)
+
+#         return data
 
 
 
