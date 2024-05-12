@@ -34,7 +34,7 @@ class CategoryItemView(generics.ListAPIView):
 
 
 class CategoryListView(generics.ListAPIView):
-    queryset = Category.objects.filter(level=3)
+    queryset = Category.objects.filter()
     serializer_class = CategorySerializer
 
 
